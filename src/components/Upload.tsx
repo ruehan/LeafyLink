@@ -15,6 +15,20 @@ const Upload : React.FC<UploadProps> = ({ onUpload }) => {
 
     const [editedImage, setEditedImage] = useState<string | null>(null);
 
+    const dataURItoBlob = (dataURI: string) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+    
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+    
+        return new Blob([ab], { type: mimeString });
+      };
+
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
 
@@ -33,12 +47,16 @@ const Upload : React.FC<UploadProps> = ({ onUpload }) => {
     const handleUpload = () => {
         if (editedImage) {
             // 이미지가 편집되었으면 편집된 이미지를 업로드
+            const editedBlob = dataURItoBlob(editedImage);
+            const editedFile = new File([editedBlob], 'edited_image.jpeg', { type: 'image/jpeg' });
+
             alert(`Image Uploaded! [${editedImage}]`);
+            onUpload(editedFile)
 
           } else if (selectedImage) {
             // 이미지가 편집되지 않았으면 원본 이미지를 업로드
             alert(`Image Uploaded! [${selectedImage.name}]`);
-
+            onUpload(selectedImage)
           }
     }
 
