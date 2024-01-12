@@ -1,5 +1,7 @@
 .upload-container {
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
   }
   
 .upload-input {
@@ -14,4 +16,6 @@
     padding: 10px 15px;
     border-radius: 5px;
     font-size: 16px;
+    width: 200px;
+    margin-top: 30px;
 }
