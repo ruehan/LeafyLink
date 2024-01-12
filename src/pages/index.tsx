@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import Upload from '../components/Upload';
-// import Result from '../components/Result';
+import Result from '../components/Result';
 
 
 const Home = () => {
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
   const handleUpload = (image: File) => {
-    // 이미지 업로드 후 결과를 받아오는 비동기 함수 호출
-    // 예: analyzeImage(image).then(result => setAnalysisResult(result));
-    // (analyzeImage 함수는 백엔드와 통신하여 이미지를 분석하는 함수)
-    // 임시로 결과를 설정하는 코드로 대체
+    console.log('Healthy!')
     setAnalysisResult('Healthy Plant');
   };
 
@@ -18,7 +15,7 @@ const Home = () => {
     <div>
       <h1>Plant Analysis App</h1>
       <Upload onUpload={handleUpload} />
-      {/* <Result result={analysisResult} /> */}
+      <Result result={analysisResult} />
     </div>
   );
 };
