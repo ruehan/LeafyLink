@@ -48,8 +48,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ image, onSave, onCancel }) =>
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
-        <div style={{ position: 'relative', width: '50%', height: '300px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%'}}>
+        <div style={{ position: 'relative', width: '100%', height: '300px' }}>
           <Cropper
             image={image}
             crop={crop}
@@ -60,7 +60,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ image, onSave, onCancel }) =>
           />
         </div>
       </div>
-      <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <button
           onClick={saveCroppedImage}
           style={{
