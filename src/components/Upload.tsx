@@ -1,106 +1,102 @@
-import React, {useState, ChangeEvent} from 'react';
+
+import React, { useState, ChangeEvent } from 'react';
+import ImageEditor from '../components/ImageEditor';
 import styles from '../styles/Upload.module.css';
 
-import ImageEditor from './ImageEditor';
+const Upload: React.FC<{ onUpload: (image: File) => void }> = ({ onUpload }) => {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [editedImage, setEditedImage] = useState<string | null>(null);
+  const [showImageEditor, setShowImageEditor] = useState(false);
 
-interface UploadProps{
-    onUpload: (image: File) => void;
-}
+  const dataURItoBlob = (dataURI: string) => {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
-const Upload : React.FC<UploadProps> = ({ onUpload }) => {
-    const [selectedImage, setSelectedImage] = useState<File | null>(null)
-    const [previewImage, setPreviewImage] = useState<string | null>(null)
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
 
-    const [showImageEditor, setShowImageEditor] = useState(false);
-
-    const [editedImage, setEditedImage] = useState<string | null>(null);
-
-    const dataURItoBlob = (dataURI: string) => {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-    
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-    
-        return new Blob([ab], { type: mimeString });
-      };
-
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-
-       if(file){
-        const imageUrl = URL.createObjectURL(file);
-        setPreviewImage(imageUrl);
-        setSelectedImage(file);
-       }else{
-        setPreviewImage(null);
-        setSelectedImage(null);
-       }
-
-        
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
     }
 
-    const handleUpload = () => {
-        if (editedImage) {
-            // 이미지가 편집되었으면 편집된 이미지를 업로드
-            const editedBlob = dataURItoBlob(editedImage);
-            const editedFile = new File([editedBlob], 'edited_image.jpeg', { type: 'image/jpeg' });
+    return new Blob([ab], { type: mimeString });
+  };
 
-            alert(`Image Uploaded! [${editedImage}]`);
-            onUpload(editedFile)
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
 
-          } else if (selectedImage) {
-            // 이미지가 편집되지 않았으면 원본 이미지를 업로드
-            alert(`Image Uploaded! [${selectedImage.name}]`);
-            onUpload(selectedImage)
-          }
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+      setSelectedImage(file);
+    } else {
+      setPreviewImage(null);
+      setSelectedImage(null);
     }
+  };
 
-    const handleEditButtonClick = () => {
-        setShowImageEditor(true);
-      };
-    
-      const handleImageEditorSave = (croppedImage: string) => {
-        
-        setEditedImage(croppedImage)
-        console.log('Cropped Image:', croppedImage);
-    
-        // alert('Cropped Image: ' + croppedImage);
-    
-        setShowImageEditor(false);
-      };
-    
-      const handleImageEditorCancel = () => {
-        setShowImageEditor(false);
-      };
+  const handleUpload = () => {
+    if (editedImage) {
+      // 이미지가 편집되었으면 편집된 이미지를 Blob 형태로 변환하여 업로드
+      const editedBlob = dataURItoBlob(editedImage);
+      const editedFile = new File([editedBlob], 'edited_image.jpeg', { type: 'image/jpeg' });
 
-    return (
-        <div className={styles['upload-container']}>
-            <input type="file" accept="image/*" onChange={handleImageChange} className={styles['upload-input']} />
-            {previewImage && <img src={previewImage} alt="Preview" style={{ maxWidth: '300px', maxHeight: '600px', marginTop: '10px' }} />}
-            {editedImage && (
-                <div>
-                <h3>Edited Preview</h3>
-                <img src={editedImage} alt="Edited Preview" style={{ maxWidth: '100%', maxHeight: '300px' }} />
-                </div>
-            )}
+      alert(`Image Uploaded! [Edited Image]`);
+      onUpload(editedFile);
+    } else if (selectedImage) {
+      alert(`Image Uploaded! [${selectedImage.name}]`);
+      onUpload(selectedImage);
+    }
+  };
 
-            <button onClick={handleUpload} className={styles['upload-button']}>Upload Image</button>
+  const handleEditButtonClick = () => {
+    setEditedImage(null); // 수정 전에 초기화
+    setShowImageEditor(true);
+  };
 
-            <button onClick={handleEditButtonClick} className={styles['edit-button']}>Edit Image</button>
+  const handleImageEditorSave = (croppedImage: string) => {
+    setEditedImage(croppedImage);
+    // 이미지 편집 모드 종료
+    setShowImageEditor(false);
+  };
 
-            {/* 이미지 편집 모달 */}
-            {showImageEditor && selectedImage && (
-                <div className={styles['image-editor-container']}>
-                <ImageEditor image={previewImage || ''} onSave={handleImageEditorSave} onCancel={handleImageEditorCancel} />
-                </div>
-            )}
+  const handleImageEditorCancel = () => {
+    // 이미지 편집 모드 종료
+    setShowImageEditor(false);
+  };
+
+  return (
+    <div className={styles.uploadContainer}>
+      <div className={styles.uploadSection}>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+          <div className={styles.editedPreviewContainer}>
+            {editedImage ? (
+                <img src={editedImage} alt="Edited Preview" className={styles.editedPreviewImage} />
+              
+            ) : previewImage ? (
+              <img src={previewImage} alt="Selected Preview" className={styles.selectedPreviewImage} />
+            ) : null}
+            </div>
+        <button onClick={handleUpload} className={styles.uploadButton}>
+          Upload Image
+        </button>
+        <button onClick={handleEditButtonClick} className={styles.editButton}>
+          Edit Image
+        </button>
+      </div>
+
+      <div className={styles.editorSection}>
+        <div className={styles.selectedImagePreview}>
+          {showImageEditor && selectedImage && (
+            <div className={styles.imageEditorContainer}>
+              <ImageEditor image={previewImage || ''} onSave={handleImageEditorSave} onCancel={handleImageEditorCancel} />
+            </div>
+          )}
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default Upload;
