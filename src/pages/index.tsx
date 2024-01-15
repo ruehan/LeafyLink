@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import Upload from '../components/Upload';
-import Result from '../components/Result';
+import styles from '../styles/Index.module.css';
 
 
 const Home = () => {
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
   const handleUpload = (image: File) => {
-    console.log('Healthy!')
+    // 추후 알고리즘 결과 삽입
     setAnalysisResult('Healthy Plant');
   };
 
   return (
-    <div>
-      <h1>Plant Analysis App</h1>
+    <div className={styles.mainContainer}>
+      <h3>ReafyLink</h3>
       <Upload onUpload={handleUpload} />
-      <Result result={analysisResult} />
     </div>
   );
 };
