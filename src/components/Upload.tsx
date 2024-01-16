@@ -39,8 +39,17 @@ const Upload: React.FC<{ onUpload: (image: File) => void }> = ({ onUpload }) => 
   const handleUpload = () => {
     if (editedImage) {
       // 이미지가 편집되었으면 편집된 이미지를 Blob 형태로 변환하여 업로드
+
+      const now = new Date();	// 현재 날짜 및 시간
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const hour = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
       const editedBlob = dataURItoBlob(editedImage);
-      const editedFile = new File([editedBlob], 'edited_image.jpeg', { type: 'image/jpeg' });
+      const editedFile = new File([editedBlob], `${year}.${month}.${date}-${hour}:${minutes}:${seconds}.jpeg`, { type: 'image/jpeg' });
 
       alert(`Image Uploaded! [Edited Image]`);
       onUpload(editedFile);
